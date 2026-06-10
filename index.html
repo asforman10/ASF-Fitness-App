@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Fitness Tracker</title>
+    <style>
+        /* CSS Variables for Light and Dark Modes */
+        :root {
+            --bg-color: #f4f7f6;
+            --text-color: #333333;
+            --card-bg: #ffffff;
+            --accent-color: #27ae60;
+            --accent-hover: #2ecc71;
+            --secondary-color: #34495e;
+            --secondary-hover: #2c3e50;
+            --shadow: 0 4px 6px rgba(0,0,0,0.08);
+            --stat-bg: #ecf0f1;
+            --border-color: #e2e8f0;
+        }
+
+        body.dark-theme {
+            --bg-color: #121212;
+            --text-color: #e2e8f0;
+            --card-bg: #1e1e1e;
+            --accent-color: #2ecc71;
+            --accent-hover: #27ae60;
+            --secondary-color: #4f5d73;
+            --secondary-hover: #3b4656;
+            --shadow: 0 4px 6px rgba(0,0,0,0.5);
+            --stat-bg: #2d2d2d;
+            --border-color: #333333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Top Header Styling */
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        h1, h2 {
+            margin: 0;
+            color: var(--accent-color);
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        /* Dark Mode Button */
+        #theme-toggle {
+            width: auto;
+            margin: 0;
+            padding: 8px 15px;
+            background-color: var(--secondary-color);
+        }
+        #theme-toggle:hover {
+            background-color: var(--secondary-hover);
+        }
+
+        /* Motivational Widget */
+        .quote-box {
+            background-color: var(--stat-bg);
+            border-left: 5px solid var(--accent-color);
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        /* Grid Layout for Modern Look */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .full-width {
+                grid-column: span 2;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            box-sizing: border-box;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: var(--accent-color);
+            color: white;
+            font-weight: bold;
+            border: none;
+            margin-top: 15px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .summary-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: space-between;
+            text-align: center;
+        }
+
+        .stat-box {
+            background: var(--stat-bg);
+            padding: 15px;
+            border-radius: 8px;
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .stat-number {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--accent-color);
+            display: block;
+        }
+
+        /* Goal and Hydration Progress Bar */
+        .progress-container {
+            margin-top: 15px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .goal-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .goal-input-wrapper label {
+            margin: 0;
+        }
+
+        .goal-input-wrapper input {
+            width: 60px;
+            padding: 5px;
+            margin: 0;
+            text-align: center;
+        }
+
+        .progress-bar-bg {
+            background-color: var(--stat-bg);
+            border-radius: 10px;
+            height: 14px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            background-color: var(--accent-color);
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .water-fill {
+            background-color: #3498db;
+        }
+
+        .water-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .water-controls button {
+            margin-top: 5px;
+            font-size: 14px;
+            padding: 8px;
+        }
+
+        .btn-water {
+            background-color: #3498db;
+        }
+        .btn-water:hover {
+            background-color: #2980b9;
+        }
+
+        /* Recent Workouts list and Delete Buttons */
+        #workout-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #workout-list li {
+            background: var(--stat-bg);
+            margin-bottom: 8px;
+            padding: 12px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+
+        .delete-btn {
+            background-color: #e74c3c;
+            width: auto;
+            margin: 0;
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+
+        /* Manage Data Buttons */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--secondary-hover);
+        }
+
+        /* BMI Result box */
+        #bmi-result {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: var(--stat-bg);
+            border-radius: 5px;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-section">
+        <h1>💪 My Fitness Tracker</h1>
+        <button id="theme-toggle">🌙 Dark Mode</button>
+    </div>
+
+    <!-- Motivation Display -->
+    <div class="quote-box" id="quote-box">
+        💡 <span id="quote-display">Loading daily fitness inspiration...</span>
+    </div>
+
+    <div class="dashboard-grid">
+
+        <!-- LOG WORKOUT SECTION -->
+        <div class="card">
+            <h2>Log a Workout</h2>
+            <form id="workout-form">
+                <label for="date">Date:</label>
+                <input type="date" id="date" required>
+
+                <label for="workout-type">Workout Type:</label>
+                <select id="workout-type" required>
+                    <option value="Running">Running (~11 kcal/min)</option>
+                    <option value="Weightlifting">Weightlifting (~6 kcal/min)</option>
+                    <option value="Cycling">Cycling (~8 kcal/min)</option>
+                    <option value="Yoga">Yoga (~4 kcal/min)</option>
+                    <option value="Swimming">Swimming (~9 kcal/min)</option>
+                    <option value="HIIT">HIIT / Cardio (~12 kcal/min)</option>
+                </select>
+
+                <label for="duration">Duration (Minutes):</label>
+                <input type="number" id="duration" placeholder="e.g. 45" required min="1">
+
+                <button type="submit">Save Workout</button>
+            </form>
+        </div>
+
+        <!-- SUMMARY SECTION -->
+        <div class="card">
+            <h2>Workout Summary</h2>
+            <div class="summary-stats">
+                <div class="stat-box">
+                    <span class="stat-number" id="week-count">0</span>
+                    This Week
+                </div>
+                <div class="stat-box">
+                    <span class="stat-number" id="month-count">0</span>
+                    This Month
+                </div>
+                <div class="stat-box">
+                    <span class="stat-number" id="year-count">0</span>
+                    This Year
+                </div>
+                <div class="stat-box">
+                    <span class="stat-number" id="calorie-count">0</span>
+                    Total Kcal
+                </div>
+            </div>
+
+            <!-- Weekly Goal Progress Tracker -->
+            <div class="progress-container" style="border-top: 1px solid var(--border-color); margin-top: 20px; padding-top: 15px;">
+                <div class="progress-header">
+                    <span id="goal-text">Goal Progress: 0 / 4 days active</span>
+                    <div class="goal-input-wrapper">
+                        <label for="weekly-goal">Goal:</label>
+                        <input type="number" id="weekly-goal" min="1" max="7" value="4">
+                    </div>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="goal-progress"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- WATER INTAKE TRACKER -->
+        <div class="card">
+            <h2>💧 Daily Water Tracker</h2>
+            <div class="progress-container">
+                <div class="progress-header">
+                    <span>Target: 8 Glasses (250ml each)</span>
+                    <span><strong id="water-count">0</strong> / 8 Glasses</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill water-fill" id="water-progress"></div>
+                </div>
+            </div>
+            <div class="water-controls">
+                <button type="button" id="add-water" class="btn-water">🥛 Add a Glass</button>
+                <button type="button" id="reset-water" class="btn-secondary">🔄 Reset</button>
+            </div>
+        </div>
+
+        <!-- BMI CALCULATOR -->
+        <div class="card">
+            <h2>⚖️ BMI Calculator</h2>
+            <form id="bmi-form">
+                <div style="display: flex; gap: 10px;">
+                    <div style="flex: 1;">
+                        <label for="bmi-weight">Weight (lbs):</label>
+                        <input type="number" id="bmi-weight" placeholder="e.g. 150" required min="10" step="0.1">
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Height (Feet/Inches):</label>
+                        <div style="display: flex; gap: 5px;">
+                            <input type="number" id="bmi-feet" placeholder="Ft" required min="1" max="8" style="margin-top: 5px;">
+                            <input type="number" id="bmi-inches" placeholder="In" required min="0" max="11" style="margin-top: 5px;">
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn-secondary">Calculate BMI</button>
+            </form>
+            <div id="bmi-result">Enter your details to calculate body mass index.</div>
+        </div>
+
+        <!-- DYNAMIC DISTRIBUTION CHART -->
+        <div class="card full-width">
+            <h2>📊 Workout Distribution (Mins)</h2>
+            <div id="distribution-chart">
+                <p style="text-align: center; color: var(--text-color); font-style: italic;">Log your workouts to generate charts!</p>
+            </div>
+        </div>
+
+        <!-- LOG SECTION: Shows your recent entries -->
+        <div class="card full-width">
+            <h2>Recent Workouts</h2>
+            <ul id="workout-list"></ul>
+        </div>
+
+        <!-- DATA MANAGEMENT SECTION: Import / Export JSON backup -->
+        <div class="card full-width">
+            <h2>Backup & Manage Data</h2>
+            <div class="btn-group">
+                <button id="export-btn" class="btn-secondary">📤 Export History (JSON)</button>
+                <button id="import-btn" class="btn-secondary">📥 Import Backup</button>
+            </div>
+            <input type="file" id="import-file" style="display: none;" accept=".json">
+        </div>
+
+    </div>
+
+    <!-- JAVASCRIPT: The interactive logic -->
+    <script>
+        // -------------------------------------------------------------------------
+        // UNIVERSAL SANDBOX STORAGE SUPPORT
+        // -------------------------------------------------------------------------
+        var isStorageAvailable = false;
+        try {
+            var testKey = '__storage_test__';
+            window.localStorage.setItem(testKey, testKey);
+            window.localStorage.removeItem(testKey);
+            isStorageAvailable = true;
+        } catch (e) {
+            isStorageAvailable = false;
+        }
+
+        var memoryStore = {};
+
+        function getStorageItem(key) {
+            if (isStorageAvailable) {
+                try {
+                    return window.localStorage.getItem(key);
+                } catch (e) {}
+            }
+            return memoryStore[key] || null;
+        }
+
+        function setStorageItem(key, value) {
+            if (isStorageAvailable) {
+                try {
+                    window.localStorage.setItem(key, value);
+                    return;
+                } catch (e) {}
+            }
+            memoryStore[key] = String(value);
+        }
+
+        // Helper function to count elements in ES5 objects (Replaces Set properties)
+        function getObjectSize(obj) {
+            var count = 0;
+            for (var key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        // Set today's date as default
+        document.getElementById('date').valueAsDate = new Date();
+
+        // Estimated calorie burn multipliers (kcal burned per minute)
+        var calorieRates = {
+            Running: 11,
+            Weightlifting: 6,
+            Cycling: 8,
+            Yoga: 4,
+            Swimming: 9,
+            HIIT: 12
+        };
+
+        // Quotes Array
+        var fitnessQuotes = [
+            "Your body can stand almost anything. It's your mind you have to convince.",
+            "Success isn't always about greatness. It's about consistency.",
+            "What hurts today makes you stronger tomorrow. Keep pushing!",
+            "Did you drink enough water today? Hydrate for better fat metabolism!",
+            "Active rest days ar
